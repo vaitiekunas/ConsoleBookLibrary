@@ -15,5 +15,9 @@ namespace ConsoleBookLibrary.Models
         public string Language { get; set; }
         public string PublicationDate { get; set; }
         public string ISBN { get; set; }
+        public bool Availability { get; set; }
+        public string ReaderName { get; set; }
+        public DateTime TakeDate { get; set; }
+        public DateTime ReturnDate { get; set; }
     }
 }
