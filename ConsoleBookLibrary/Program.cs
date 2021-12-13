@@ -13,10 +13,12 @@ namespace ConsoleBookLibrary
         public static DateTime DateOfToday { get; set; }
         public static DateTime DateOfReturn { get; set; }
 
+        public static string filePath;
+
         static void Main(string[] args)
         {
             Console.WriteLine("Hello. Welcome to the library by Sarunas Vaitiekunas");
-
+            filePath = @"D:\BookList.json";
             MainChoice();
 
             Console.ReadLine();
@@ -138,11 +140,11 @@ namespace ConsoleBookLibrary
 
         private static void CheckListFile()
         {
-            if (!File.Exists(@"D:\BookList.json"))
+            if (!File.Exists(filePath))
             {
                 Console.WriteLine("The book list file does not exist, so a new one will be created.");
 
-                using (StreamWriter writeListLine = File.AppendText(@"D:\BookList.json"))
+                using (StreamWriter writeListLine = File.AppendText(filePath))
                 {
                     Console.WriteLine("\nThe book list file was created.");
                 }
@@ -151,7 +153,7 @@ namespace ConsoleBookLibrary
 
         private static List<Book> DeserializeBookList()
         {
-            string bookListData = System.IO.File.ReadAllText(@"D:\BookList.json");
+            string bookListData = System.IO.File.ReadAllText(filePath);
             List<Book> bookList = JsonConvert.DeserializeObject<List<Book>>(bookListData);
 
             return bookList;
@@ -328,7 +330,7 @@ namespace ConsoleBookLibrary
             );
 
             string newBookList = JsonConvert.SerializeObject(books, Formatting.Indented);
-            System.IO.File.WriteAllText(@"D:\BookList.json", newBookList);
+            System.IO.File.WriteAllText(filePath, newBookList);
 
             Console.WriteLine("\nNew book was added to the list file.");
         }
@@ -473,7 +475,7 @@ namespace ConsoleBookLibrary
             }
 
             string newBookList = JsonConvert.SerializeObject(books, Formatting.Indented);
-            System.IO.File.WriteAllText(@"D:\BookList.json", newBookList);
+            System.IO.File.WriteAllText(filePath, newBookList);
         }
                
         private static void DeleteBook(int dId)
@@ -492,7 +494,7 @@ namespace ConsoleBookLibrary
             }
 
             string newBookList = JsonConvert.SerializeObject(books, Formatting.Indented);
-            System.IO.File.WriteAllText(@"D:\BookList.json", newBookList);
+            System.IO.File.WriteAllText(filePath, newBookList);
             Console.WriteLine("\nThe book was deleted from the list file.");
         }
     }
