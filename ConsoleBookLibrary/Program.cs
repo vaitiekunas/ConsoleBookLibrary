@@ -10,6 +10,10 @@ namespace ConsoleBookLibrary
 {
     class Program
     {
+        public static string NameOfReader { get; set; }
+        public static DateTime DateOfToday { get; set; }
+        public static DateTime DateOfReturn { get; set; }
+
         static void Main(string[] args)
         {
             Console.WriteLine("Hello. Welcome to the library.");
@@ -47,12 +51,12 @@ namespace ConsoleBookLibrary
                     MainChoice();
                     break;
                 case 4:
-                    ReturnBook(8);
+                    ReturnBook();
                     MainChoice();
                     break;
                 case 5:
                     FilterAll();
-                    Console.WriteLine("\nPlease enter Id of the book which you want to delete from the list.");
+                    Console.WriteLine("\nPlease enter Id of the book which you want to delete from the list:");
                     DeleteBook(Convert.ToInt32(Console.ReadLine()));
                     MainChoice();
                     break;
@@ -91,32 +95,32 @@ namespace ConsoleBookLibrary
                     FilterChoice();
                     break;
                 case 2:
-                    Console.WriteLine("\nFilter by author. Please enter word or fragment.");
+                    Console.WriteLine("\nFilter by author. Please enter word or fragment:");
                     FilterByAuthor(Console.ReadLine());
                     FilterChoice();
                     break;
                 case 3:
-                    Console.WriteLine("\nFilter by category. Please enter word or fragment.");
+                    Console.WriteLine("\nFilter by category. Please enter word or fragment:");
                     FilterByCategory(Console.ReadLine());
                     FilterChoice();
                     break;
                 case 4:
-                    Console.WriteLine("\nFilter by language. Please enter word or fragment.");
+                    Console.WriteLine("\nFilter by language. Please enter word or fragment:");
                     FilterByLanguage(Console.ReadLine());
                     FilterChoice();
                     break;
                 case 5:
-                    Console.WriteLine("\nFilter by ISBN. Please enter word or fragment.");
+                    Console.WriteLine("\nFilter by ISBN. Please enter word or fragment:");
                     FilterByISBN(Console.ReadLine());
                     FilterChoice();
                     break;
                 case 6:
-                    Console.WriteLine("\nFilter by name. Please enter word or fragment.");
+                    Console.WriteLine("\nFilter by name. Please enter word or fragment:");
                     FilterByName(Console.ReadLine());
                     FilterChoice();
                     break;
                 case 7:
-                    Console.WriteLine("\nFilter by availability. Please enter true or false.");
+                    Console.WriteLine("\nFilter by availability. Please enter true or false:");
                     FilterByAvailability(Console.ReadLine());
                     FilterChoice();
                     break;
@@ -244,6 +248,46 @@ namespace ConsoleBookLibrary
             }
         }
 
+        private static void GetReaderName()
+        {
+            Console.WriteLine("Please enter your name:");
+            NameOfReader = Console.ReadLine();
+        }
+
+        private static void GetTodayDate()
+        {
+            Console.WriteLine("Please enter date of today YYYY-MM-DD (it's for app testing):");
+            DateOfToday = Convert.ToDateTime(Console.ReadLine());
+        }
+
+        private static void GetReturnDate()
+        {
+            Console.WriteLine("Please enter date of planned return:");
+            DateOfReturn = Convert.ToDateTime(Console.ReadLine());
+            TimeSpan diff = DateOfReturn.Date - DateOfToday.Date;
+            int period = (int)diff.TotalDays;
+
+            while (period < 0 || period > 62)
+            {
+                if (period < 0)
+                {
+                    Console.WriteLine("Planned return date must be from the future not from the past :) Please enter another:");
+                }
+                else if (period > 62)
+                {
+                    Console.WriteLine("Planned return date is very far away (More than 2 months). Please enter another:");
+                }
+                DateOfReturn = Convert.ToDateTime(Console.ReadLine());
+                diff = DateOfReturn.Date - DateOfToday.Date;
+                period = (int)diff.TotalDays;
+            }
+
+            if (period == 0)
+            {
+                Console.WriteLine("Fast reader, but it's OK :)");
+            }
+        }
+
         private static void AddBook()
         {
             Console.WriteLine("Enter name of new book:");
@@ -281,7 +325,7 @@ namespace ConsoleBookLibrary
                 PublicationDate = bookPublicationDate,
                 ISBN = bookIsbn,
                 Availability = true,
-                ReaderName = null
+                ReaderName = ""
             }
             );
 
@@ -295,57 +339,47 @@ namespace ConsoleBookLibrary
         {
             CheckListFile();
 
-            Console.WriteLine("Please enter yout name");
-            String readerName = Console.ReadLine();
+            GetReaderName();
 
-            Console.WriteLine("Please enter date of today YYYY-MM-DD (it's for app testing)");
-            DateTime today = Convert.ToDateTime(Console.ReadLine());
+            GetTodayDate();
 
-            Console.WriteLine("Please enter date of planned return");
-            DateTime plReturnDate = Convert.ToDateTime(Console.ReadLine());
-            TimeSpan diff = plReturnDate.Date - today.Date;
-            int period = (int)diff.TotalDays;
+            GetReturnDate();
 
-            while (period < 0 || period > 62)
-            {
-                if (period < 0)
-                {
-                    Console.WriteLine("Planned return date must be from the future not from the past :) Please enter another");
-                }
-                else if (period > 62)
-                {
-                    Console.WriteLine("Planned return date is very far away (More than 2 months). Please enter another");
-                }
-                plReturnDate = Convert.ToDateTime(Console.ReadLine());
-                diff = plReturnDate.Date - today.Date;
-                period = (int)diff.TotalDays;
-            }
+            Console.WriteLine("\n===== All available books =====");
 
-            if (period == 0)
-            {
-                Console.WriteLine("Fast reader, but it's OK :)");
-            }
-
-            Console.WriteLine("===== All available books =====");
             FilterByAvailability("true");
-            Console.WriteLine("\nHow many books you will take? (Max 3 books):");
-            int b = Convert.ToInt32(Console.ReadLine());
 
-            for (var i = 1; i < b + 1; i++)
+            Console.WriteLine("\nHow many books you will take? (Max 3 books) If you will enter 0, you will return to the main menu:");
+
+            int numberOfBooks = Convert.ToInt32(Console.ReadLine());
+
+            while (numberOfBooks < 1 || numberOfBooks > 3)
+            {
+                if (numberOfBooks < 0)
+                {
+                    Console.WriteLine("Wrong number. Please enter another number:");
+                }
+                else if (numberOfBooks == 0)
+                {
+                    MainChoice();
+                }
+                else if (numberOfBooks > 3)
+                {
+                    Console.WriteLine("You can take max 3 books. Please enter another number:");
+                }
+                numberOfBooks = Convert.ToInt32(Console.ReadLine());
+            }
+
+            for (var i = 1; i < numberOfBooks + 1; i++)
             {
                 Console.WriteLine("Please enter " + i + " book Id:");
-                Console.ReadLine();
+                int rId = Convert.ToInt32(Console.ReadLine());
+                RewriteBook(rId);
             }
         }
 
-        private static void ReturnBook(int rId)
+        private static void RewriteBook(int rId)
         {
-            Console.WriteLine("Please enter yout name");
-            String readerName = Console.ReadLine();
-
-            Console.WriteLine("Please enter date of today YYYY-MM-DD (it's for app testing)");
-            DateTime today = Convert.ToDateTime(Console.ReadLine());
-
             List<Book> books = DeserializeBookList();
 
             var book = books.Find(r => r.Id == rId);
@@ -379,8 +413,10 @@ namespace ConsoleBookLibrary
                     Language = oldLanguage,
                     PublicationDate = oldPublicationDate,
                     ISBN = oldISBN,
-                    Availability = true,
-                    ReaderName = null
+                    Availability = false,
+                    ReaderName = NameOfReader,
+                    TakeDate = DateOfToday,
+                    ReturnDate = DateOfReturn
                 }
                 );
                 books = books.OrderBy(book => book.Id).ToList();
@@ -388,6 +424,27 @@ namespace ConsoleBookLibrary
 
             string newBookList = JsonConvert.SerializeObject(books, Formatting.Indented);
             System.IO.File.WriteAllText(@"D:\BookList.json", newBookList);
+        }
+
+        private static void ReturnBook()
+        {
+            GetReaderName();
+
+            GetTodayDate();
+
+            Console.WriteLine("===== Books you've taken =====");
+
+            List<Book> books = DeserializeBookList();
+
+            foreach (var book in books)
+            {
+                if (book.ReaderName.Contains(NameOfReader, StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine(book.Id + " - Available: " + book.Availability + " - Taken by: " + book.ReaderName + " - Name: " + book.Name + " - Author: " + book.Author + " - Category: " + book.Category + " - Language: " + book.Language + " Year - " + book.PublicationDate);
+                }
+            }
+
+            Console.WriteLine("Please enter book Id:");
         }
 
         private static void DeleteBook(int dId)
