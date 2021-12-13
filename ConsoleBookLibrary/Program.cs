@@ -25,7 +25,7 @@ namespace ConsoleBookLibrary
 
         private static void MainChoice()
         {
-            Console.WriteLine("===== Main menu =====");
+            Console.WriteLine("\n===== Main menu =====");
             Console.WriteLine("Choose what you want to do next:");
             Console.WriteLine("1 - View the list of books");
             Console.WriteLine("2 - Add a new book to the list");
@@ -73,7 +73,7 @@ namespace ConsoleBookLibrary
         private static void FilterChoice()
         {
             CheckListFile();
-            Console.WriteLine("===== Book list filter =====");
+            Console.WriteLine("\n===== Book list filter =====");
             Console.WriteLine("Choose what you want to do next:");
             Console.WriteLine("1 - List all the books");
             Console.WriteLine("2 - Filter by author");
@@ -375,7 +375,32 @@ namespace ConsoleBookLibrary
                 Console.WriteLine("Please enter " + i + " book Id:");
                 int rId = Convert.ToInt32(Console.ReadLine());
                 RewriteBook(rId);
+                Console.WriteLine("Have a good reading!");
             }
+        }
+
+        private static void ReturnBook()
+        {
+            GetReaderName();
+
+            GetTodayDate();
+
+            Console.WriteLine("===== Books you've taken =====");
+
+            List<Book> books = DeserializeBookList();
+
+            foreach (var book in books)
+            {
+                if (book.ReaderName.Contains(NameOfReader, StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine(book.Id + " - Available: " + book.Availability + " - Taken by: " + book.ReaderName + " - Name: " + book.Name + " - Author: " + book.Author + " - Category: " + book.Category + " - Language: " + book.Language + " Year - " + book.PublicationDate);
+                }
+            }
+
+            Console.WriteLine("Please enter return book Id:");
+            int rId = Convert.ToInt32(Console.ReadLine());
+            RewriteBook(rId);
+            Console.WriteLine("Thanks for reading!");
         }
 
         private static void RewriteBook(int rId)
@@ -404,49 +429,47 @@ namespace ConsoleBookLibrary
                     books.Remove(bookToRemove);
                 }
 
-                books.Add(new Book()
+                if (oldAvailability == false)
                 {
-                    Id = oldId,
-                    Name = oldName,
-                    Author = oldAuthor,
-                    Category = oldCategory,
-                    Language = oldLanguage,
-                    PublicationDate = oldPublicationDate,
-                    ISBN = oldISBN,
-                    Availability = false,
-                    ReaderName = NameOfReader,
-                    TakeDate = DateOfToday,
-                    ReturnDate = DateOfReturn
+                    books.Add(new Book()
+                    {
+                        Id = oldId,
+                        Name = oldName,
+                        Author = oldAuthor,
+                        Category = oldCategory,
+                        Language = oldLanguage,
+                        PublicationDate = oldPublicationDate,
+                        ISBN = oldISBN,
+                        Availability = true,
+                        ReaderName = ""
+                    }
+                    );
                 }
-                );
+                else if (oldAvailability == true)
+                {
+                    books.Add(new Book()
+                    {
+                        Id = oldId,
+                        Name = oldName,
+                        Author = oldAuthor,
+                        Category = oldCategory,
+                        Language = oldLanguage,
+                        PublicationDate = oldPublicationDate,
+                        ISBN = oldISBN,
+                        Availability = false,
+                        ReaderName = NameOfReader,
+                        TakeDate = DateOfToday,
+                        ReturnDate = DateOfReturn
+                    }
+                    );
+                }
                 books = books.OrderBy(book => book.Id).ToList();
             }
 
             string newBookList = JsonConvert.SerializeObject(books, Formatting.Indented);
             System.IO.File.WriteAllText(@"D:\BookList.json", newBookList);
         }
-
-        private static void ReturnBook()
-        {
-            GetReaderName();
-
-            GetTodayDate();
-
-            Console.WriteLine("===== Books you've taken =====");
-
-            List<Book> books = DeserializeBookList();
-
-            foreach (var book in books)
-            {
-                if (book.ReaderName.Contains(NameOfReader, StringComparison.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine(book.Id + " - Available: " + book.Availability + " - Taken by: " + book.ReaderName + " - Name: " + book.Name + " - Author: " + book.Author + " - Category: " + book.Category + " - Language: " + book.Language + " Year - " + book.PublicationDate);
-                }
-            }
-
-            Console.WriteLine("Please enter book Id:");
-        }
-
+               
         private static void DeleteBook(int dId)
         {
             List<Book> books = DeserializeBookList();
