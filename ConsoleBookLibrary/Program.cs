@@ -1,7 +1,6 @@
 ﻿using System;
 using ConsoleBookLibrary.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ namespace ConsoleBookLibrary
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello. Welcome to the library.");
+            Console.WriteLine("Hello. Welcome to the library by Sarunas Vaitiekunas");
 
             MainChoice();
 
@@ -32,7 +31,7 @@ namespace ConsoleBookLibrary
             Console.WriteLine("3 - Take books");
             Console.WriteLine("4 - Return books");
             Console.WriteLine("5 - Delete a book");
-            Console.WriteLine("6 - Exit library");
+            Console.WriteLine("\n6 - Exit library");
 
             int choice = Convert.ToInt32(Console.ReadLine());
 
@@ -82,7 +81,7 @@ namespace ConsoleBookLibrary
             Console.WriteLine("5 - Filter by ISBN");
             Console.WriteLine("6 - Filter by name");
             Console.WriteLine("7 - Filter taken or available books");
-            Console.WriteLine("8 - Back to main menu");
+            Console.WriteLine("\n8 - Back to main menu");
             Console.WriteLine("9 - Exit library");
 
             int choice = Convert.ToInt32(Console.ReadLine());
@@ -90,7 +89,7 @@ namespace ConsoleBookLibrary
             switch (choice)
             {
                 case 1:
-                    Console.WriteLine("\nList all the books.");
+                    Console.WriteLine("\nList all the books:");
                     FilterAll();
                     FilterChoice();
                     break;
@@ -145,7 +144,7 @@ namespace ConsoleBookLibrary
 
                 using (StreamWriter writeListLine = File.AppendText(@"D:\BookList.json"))
                 {
-                    Console.WriteLine("The book list file was created.");
+                    Console.WriteLine("\nThe book list file was created.");
                 }
             }
         }
@@ -284,7 +283,7 @@ namespace ConsoleBookLibrary
 
             if (period == 0)
             {
-                Console.WriteLine("Fast reader, but it's OK :)");
+                Console.WriteLine("\nFast reader, but it's OK :)");
             }
         }
 
@@ -302,7 +301,6 @@ namespace ConsoleBookLibrary
             string bookPublicationDate = Console.ReadLine();
             Console.WriteLine("Enter ISBN of new book:");
             string bookIsbn = Console.ReadLine();
-            Console.WriteLine();
 
             List<Book> books = DeserializeBookList();
 
@@ -332,7 +330,7 @@ namespace ConsoleBookLibrary
             string newBookList = JsonConvert.SerializeObject(books, Formatting.Indented);
             System.IO.File.WriteAllText(@"D:\BookList.json", newBookList);
 
-            Console.WriteLine("New book was added to the list file.");
+            Console.WriteLine("\nNew book was added to the list file.");
         }
 
         private static void TakeBook()
@@ -375,7 +373,7 @@ namespace ConsoleBookLibrary
                 Console.WriteLine("Please enter " + i + " book Id:");
                 int rId = Convert.ToInt32(Console.ReadLine());
                 RewriteBook(rId);
-                Console.WriteLine("Have a good reading!");
+                Console.WriteLine("\nHave a good reading!");
             }
         }
 
@@ -400,7 +398,7 @@ namespace ConsoleBookLibrary
             Console.WriteLine("Please enter return book Id:");
             int rId = Convert.ToInt32(Console.ReadLine());
             RewriteBook(rId);
-            Console.WriteLine("Thanks for reading!");
+            Console.WriteLine("\nThanks for reading!");
         }
 
         private static void RewriteBook(int rId)
@@ -429,7 +427,7 @@ namespace ConsoleBookLibrary
                     books.Remove(bookToRemove);
                 }
 
-                if (oldAvailability == false)
+                if (oldAvailability == false) //For ReturnBook
                 {
                     books.Add(new Book()
                     {
@@ -444,8 +442,16 @@ namespace ConsoleBookLibrary
                         ReaderName = ""
                     }
                     );
+
+                    TimeSpan diff = DateOfToday.Date - oldTakeDate.Date;
+                    int period = (int)diff.TotalDays;
+
+                    if (period > 62)
+                    {
+                        Console.WriteLine("\nIt's not nice to be late. Next time penalty: a euro, a kiss and a bun :)");
+                    }
                 }
-                else if (oldAvailability == true)
+                else if (oldAvailability == true) //For TakeBook
                 {
                     books.Add(new Book()
                     {
@@ -487,7 +493,7 @@ namespace ConsoleBookLibrary
 
             string newBookList = JsonConvert.SerializeObject(books, Formatting.Indented);
             System.IO.File.WriteAllText(@"D:\BookList.json", newBookList);
+            Console.WriteLine("\nThe book was deleted from the list file.");
         }
     }
 }
-
